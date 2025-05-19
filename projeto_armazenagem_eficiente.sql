@@ -1,23 +1,21 @@
 
--- Banco de Dados: Armazenagem_Eficiente
 CREATE DATABASE IF NOT EXISTS Armazenagem_Eficiente;
 USE Armazenagem_Eficiente;
 
--- Tabela: Armazenamento
 CREATE TABLE IF NOT EXISTS Armazenamento (
     id_armazenamento INT PRIMARY KEY AUTO_INCREMENT,
     capacidade_total INT NOT NULL,
     capacidade_utilizada INT DEFAULT 0
 );
 
--- Tabela: Fornecedor
+
 CREATE TABLE IF NOT EXISTS Fornecedor (
     id_fornecedor INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(100) NOT NULL,
     contato VARCHAR(100)
 );
 
--- Tabela: Produto
+
 CREATE TABLE IF NOT EXISTS Produto (
     id_produto INT PRIMARY KEY AUTO_INCREMENT,
     descricao VARCHAR(255) NOT NULL,
@@ -28,14 +26,14 @@ CREATE TABLE IF NOT EXISTS Produto (
     FOREIGN KEY (id_fornecedor) REFERENCES Fornecedor(id_fornecedor)
 );
 
--- Tabela: Transportadora
+
 CREATE TABLE IF NOT EXISTS Transportadora (
     id_transportadora INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(100) NOT NULL,
     contato VARCHAR(100)
 );
 
--- Tabela: Pedido
+
 CREATE TABLE IF NOT EXISTS Pedido (
     id_pedido INT PRIMARY KEY AUTO_INCREMENT,
     data_pedido DATE NOT NULL,
@@ -44,7 +42,6 @@ CREATE TABLE IF NOT EXISTS Pedido (
     FOREIGN KEY (id_transportadora) REFERENCES Transportadora(id_transportadora)
 );
 
--- Tabela: Pedido_Produto (N:N)
 CREATE TABLE IF NOT EXISTS Pedido_Produto (
     id_pedido INT,
     id_produto INT,
@@ -54,7 +51,7 @@ CREATE TABLE IF NOT EXISTS Pedido_Produto (
     FOREIGN KEY (id_produto) REFERENCES Produto(id_produto)
 );
 
--- Procedimento: Atualizar estoque após pedido
+
 DELIMITER $$
 CREATE PROCEDURE AtualizarEstoquePedido(IN pedido_id INT)
 BEGIN
@@ -79,7 +76,6 @@ BEGIN
 END$$
 DELIMITER ;
 
--- Procedimento: Alocar produto em armazenamento
 DELIMITER $$
 CREATE PROCEDURE AlocarProduto(IN produto_id INT, IN qtd INT)
 BEGIN
@@ -103,9 +99,3 @@ BEGIN
 END$$
 DELIMITER ;
 
--- Exemplo de criação de usuário com permissões limitadas
--- CREATE USER 'operador'@'localhost' IDENTIFIED BY 'senha123';
--- GRANT SELECT ON Armazenagem_Eficiente.Produto TO 'operador'@'localhost';
-
--- Backup sugerido via terminal (fora do SQL)
--- mysqldump -u root -p Armazenagem_Eficiente > backup_diario.sql
