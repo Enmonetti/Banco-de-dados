@@ -1,0 +1,70 @@
+CREATE TABLE Inspecao_Qualidade (
+    ID_Inspecao INT AUTO_INCREMENT PRIMARY KEY,
+    Data_Inspecao DATE NOT NULL,
+    Resultado_Inspecao VARCHAR(100) NOT NULL,
+    FK_ID_Produto INT NOT NULL,
+    FOREIGN KEY (FK_ID_Produto) REFERENCES Produto(ID_Produto)
+);
+DELIMITER //
+
+CREATE PROCEDURE InserirInspecaoQualidade (
+    IN p_Data DATE,
+    IN p_Resultado VARCHAR(100),
+    IN p_ID_Produto INT
+)
+BEGIN
+    INSERT INTO Inspecao_Qualidade (Data_Inspecao, Resultado_Inspecao, FK_ID_Produto)
+    VALUES (p_Data, p_Resultado, p_ID_Produto);
+END //
+
+DELIMITER ;
+DELIMITER //
+
+CREATE PROCEDURE HistoricoInspecoesPorProduto (
+    IN p_ID_Produto INT
+)
+BEGIN
+    SELECT 
+        iq.ID_Inspecao,
+        iq.Data_Inspecao,
+        iq.Resultado_Inspecao,
+        p.Nome_Produto
+    FROM 
+        Inspecao_Qualidade iq
+    JOIN Produto p ON iq.FK_ID_Produto = p.ID_Produto
+    WHERE 
+        p.ID_Produto = p_ID_Produto
+    ORDER BY 
+        iq.Data_Inspecao DESC;
+END //
+
+DELIMITER ;
+DELIMITER //
+
+CREATE PROCEDURE RelatorioConformidade ()
+BEGIN
+    SELECT 
+        p.Nome_Produto,
+        COUNT(*) AS Total_Inspecoes,
+        SUM(CASE WHEN iq.Resultado_Inspecao = 'Aprovado' THEN 1 ELSE 0 END) AS Total_Aprovados,
+        SUM(CASE WHEN iq.Resultado_Inspecao = 'Reprovado' THEN 1 ELSE 0 END) AS Total_Reprovados
+    FROM 
+        Inspecao_Qualidade iq
+    JOIN Produto p ON iq.FK_ID_Produto = p.ID_Produto
+    GROUP BY 
+        p.ID_Produto;
+END //
+DELIMITER ;
+CALL InserirInspecaoQualidade('2025-06-12', 'Aprovado', 3);
+CALL HistoricoInspecoesPorProduto(3);
+CALL RelatorioConformidade();
+--markdown
+Produto
+ID_Produto (PK)
+Nome_Produto
+... (outros atributos)
+Inspecao_Qualidade
+ID_Inspecao (PK)
+Data_Inspecao
+Resultado_Inspecao
+FK_ID_Produto (FK → Produto.ID_Produto)
